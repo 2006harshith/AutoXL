@@ -1,21 +1,25 @@
 # backend/main.py
 
+from backend.preprocess import preprocess_data
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
+import joblib
 
 from backend.automl import train_models
+from backend.predict import predict
+
 
 app = FastAPI(title="AI Spreadsheet AutoML API")
 
 
 # -------------------------------
-# CORS Middleware (for extension)
+# CORS Middleware
 # -------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restrict in production
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -29,8 +33,12 @@ class TrainRequest(BaseModel):
     target_column: str
 
 
+class PredictRequest(BaseModel):
+    data: list
+
+
 # -------------------------------
-# Health Check Endpoint
+# Health Check
 # -------------------------------
 @app.get("/")
 def home():
@@ -43,56 +51,63 @@ def home():
 @app.post("/train")
 def train(request: TrainRequest):
     try:
-        # Convert JSON → DataFrame
         df = pd.DataFrame(request.data)
+        df = preprocess_data(df, request.target_column)
 
-        # -------------------------------
-        # Input Validation
-        # -------------------------------
-
-        # Empty dataset check
         if df.empty:
-            raise HTTPException(
-                status_code=400,
-                detail="Dataset is empty"
-            )
+            raise HTTPException(status_code=400, detail="Dataset is empty")
 
-        # Minimum rows check (ML needs data)
         if len(df) < 5:
             raise HTTPException(
                 status_code=400,
                 detail="Dataset too small for training (min 5 rows required)"
             )
 
-        # Target column check
         if request.target_column not in df.columns:
             raise HTTPException(
                 status_code=400,
                 detail=f"Target column '{request.target_column}' not found"
             )
 
-        # -------------------------------
-        # AutoML Execution
-        # -------------------------------
         result = train_models(df, request.target_column)
 
-        # -------------------------------
-        # Response
-        # -------------------------------
         return {
             "status": "success",
             "task_type": result["task_type"],
             "best_model": result["best_model"],
-            "metrics": result["metrics"]
+            "metrics": result["metrics"],
+            "explanation": result["explanation"],
         }
 
     except HTTPException:
-        # Preserve correct HTTP error codes
         raise
 
     except Exception as e:
-        # Catch unexpected errors
         raise HTTPException(
             status_code=500,
             detail=f"Internal Server Error: {str(e)}"
         )
+
+
+# -------------------------------
+# Predict Endpoint
+# -------------------------------
+@app.post("/predict")
+def predict_endpoint(request: PredictRequest):
+    try:
+        model = joblib.load("backend/models/model.joblib")
+        columns = joblib.load("backend/models/columns.joblib")
+
+        # Convert input → DataFrame
+        df = pd.DataFrame(request.data)
+
+        # Predict (NO preprocessing here)
+        preds = predict(model, df.to_dict(orient="records"), columns)
+
+        return {
+            "status": "success",
+            "predictions": preds
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
