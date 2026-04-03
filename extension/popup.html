@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoXL</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background -->
+  <canvas id="particles"></canvas>
+
+  <!-- Toggle -->
+  <button id="toggleEffects" class="toggle-btn">Effects: ON</button>
+
+  <!-- Main Card -->
+  <div class="container">
+
+    <div class="header">
+      <h1>Auto<span>XL</span></h1>
+      <p class="subtitle">AI-Powered AutoML</p>
+    </div>
+
+    <div class="section">
+      <label>Upload CSV</label>
+      <input type="file" id="csvFile" accept=".csv" />
+    </div>
+
+    <div class="section">
+      <label>Target Column</label>
+      <input id="targetCol" value="promoted" />
+    </div>
+
+    <div class="buttons">
+      <button id="trainBtn" class="btn primary">Train Model</button>
+      <button id="predictBtn" class="btn secondary">Predict</button>
+      <button id="downloadBtn" class="btn secondary hidden">
+        Download Predictions
+      </button>
+    </div>
+
+    <div id="status" class="status hidden"></div>
+
+    <div id="resultBox" class="result-box hidden">
+      <div id="taskType"></div>
+      <div id="bestModel"></div>
+      <div id="metrics"></div>
+      <div id="topFeatures"></div>
+    </div>
+
+    <div id="errorBox" class="error-box hidden"></div>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
