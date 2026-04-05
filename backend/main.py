@@ -1,5 +1,5 @@
 # backend/main.py
-
+from backend.summarize import SummarizeRequest, generate_summary
 from backend.preprocess import preprocess_data
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,7 @@ app = FastAPI(title="AI Spreadsheet AutoML API")
 # -------------------------------
 # CORS Middleware
 # -------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,7 +45,13 @@ class PredictRequest(BaseModel):
 def home():
     return {"message": "AutoML API is running"}
 
-
+@app.post("/summarize")
+async def summarize(data: SummarizeRequest):
+    try:
+        summary_text = generate_summary(data.ml_result, data.question)
+        return {"summary": summary_text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 # -------------------------------
 # Train Endpoint
 # -------------------------------
@@ -110,4 +117,4 @@ def predict_endpoint(request: PredictRequest):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) 

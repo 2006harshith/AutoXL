@@ -1,0 +1,13 @@
+venv/
+backend/venv/
+.venv/
+__pycache__/
+backend/__pycache__/
+backend/models/
+*.pyc
+*.pyo
+.env
+backend/.env
+.vscode/
+.DS_Store
+extension.pem

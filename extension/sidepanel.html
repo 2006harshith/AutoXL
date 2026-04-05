@@ -1,58 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AutoXL Side Panel</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>AutoXL Side Panel</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body class="sidepanel-body">
 
-  <!-- Background -->
-  <canvas id="particles"></canvas>
+<!-- Dither Background -->
+<canvas id="ditherCanvas"></canvas>
+<!-- Spark Overlay -->
+<canvas id="sparkCanvas"></canvas>
 
-  <!-- Toggle -->
-  <button id="toggleEffects" class="toggle-btn">Effects: ON</button>
+<!-- Main Content -->
+<div class="ui-layer">
 
-  <!-- Main Card -->
-  <div class="container sidepanel-container">
-
-    <div class="header">
-      <h1>Auto<span>XL</span></h1>
-      <p class="subtitle">AI-Powered AutoML</p>
-    </div>
-
-    <div class="section">
-      <label>Upload CSV</label>
-      <input type="file" id="csvFile" accept=".csv" />
-    </div>
-
-    <div class="section">
-      <label>Target Column</label>
-      <input id="targetCol" value="promoted" />
-    </div>
-
-    <div class="buttons">
-      <button id="trainBtn" class="btn primary">Train Model</button>
-      <button id="predictBtn" class="btn secondary">Predict</button>
-      <button id="downloadBtn" class="btn secondary hidden">
-        Download Predictions
-      </button>
-    </div>
-
-    <div id="status" class="status hidden"></div>
-
-    <div id="resultBox" class="result-box hidden">
-      <div id="taskType"></div>
-      <div id="bestModel"></div>
-      <div id="metrics"></div>
-      <div id="topFeatures"></div>
-    </div>
-
-    <div id="errorBox" class="error-box hidden"></div>
-
+  <div class="header">
+    <h1>Auto<span>XL</span></h1>
+    <p class="subtitle">AI-Powered AutoML</p>
   </div>
 
-  <!-- IMPORTANT: reuse same JS -->
-  <script src="popup.js"></script>
+  <div class="section">
+    <label>Upload CSV</label>
+    <input type="file" id="csvFile" accept=".csv" />
+  </div>
+
+  <div class="section">
+    <label>Target Column</label>
+    <select id="targetCol"></select>
+  </div>
+
+  <div class="buttons">
+    <button id="trainBtn" class="btn primary">Train Model</button>
+    <button id="predictBtn" class="btn secondary">Predict</button>
+    <button id="downloadBtn" class="btn secondary hidden">Download Predictions</button>
+    <button id="testBtn" class="btn secondary">Connect Sheets</button>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+
+  <div id="resultBox" class="result-box hidden">
+    <div id="taskType"></div>
+    <div id="bestModel"></div>
+    <div id="metrics"></div>
+    <div id="topFeatures"></div>
+  </div>
+
+  <div id="summarySection" class="hidden section-block">
+    <div class="result-header">AI Summary</div>
+    <div id="summaryBox" class="summary-box">Generating summary...</div>
+  </div>
+
+  <div id="chatSection" class="hidden section-block">
+    <div class="result-header">Ask About Your Data</div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Ask anything about your data..." />
+      <button id="chatBtn" class="btn primary">Send</button>
+    </div>
+    <div id="chatResponse" class="chat-response hidden"></div>
+  </div>
+
+  <div id="errorBox" class="error-box hidden"></div>
+
+</div>
+
+<script type="module" src="popup.js"></script>
 </body>
 </html>
